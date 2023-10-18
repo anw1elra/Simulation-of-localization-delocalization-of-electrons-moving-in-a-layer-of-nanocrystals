@@ -88,6 +88,10 @@
 Уравнения движения
 \end_layout
 
+\begin_layout Section
+Введение
+\end_layout
+
 \begin_layout Standard
 Траектория: 
 \begin_inset Formula $x(t),y(t)$
@@ -138,6 +142,183 @@
 \end_inset
 
  электрона, которая может зависеть от направления.
+\end_layout
+
+\begin_layout Standard
+Например, в арсениде галлия (GaAs) эффективная масса электрона:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+m^{*}=0.067m_{e}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Другие примеры уравнений движения: уравнения Лагранжа, уравнения Гамильтона
+ и т.д.
+\end_layout
+
+\begin_layout Standard
+Некоторые формы движения не приводят к конкретным траекториям.
+ Примеры: квантовые уравненния (ур-е Шредингера), уравнения переноса (теплопрово
+дности и диффузии).
+\end_layout
+
+\begin_layout Section
+Движение электронов в полупроводнике
+\end_layout
+
+\begin_layout Standard
+Теория Друде - электроны в кристалле движутся так же, как в вакууме, но
+ с другой (эффективной) массой, а также на них действует сила сопротивления
+ со стороны кристалла, пропорциальная скорости.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\ddot{\vec{r}}=\frac{q}{m^{*}}\left(\vec{E}+\left[\dot{\vec{r}},\vec{B}\right]\right)-\frac{\dot{\vec{r}}}{\tau}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\tau$
+\end_inset
+
+ - время рассеяния (на самом деле означает время свободного пробега электрона).
+\end_layout
+
+\begin_layout Standard
+Если кроме полей и кристалла электрон движется в каком-то ещё потенциале
+ 
+\begin_inset Formula $U(\vec{r})$
+\end_inset
+
+ (например, он движется среди нанокристаллов или квантовых точек), то необходимо
+ добавить силу, связанную с этим потенциалом:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\ddot{\vec{r}}=\frac{q}{m^{*}}\left(\vec{E}+\left[\dot{\vec{r}},\vec{B}\right]\right)-\frac{\dot{\vec{r}}}{\tau}-\frac{1}{m^{*}}\nabla U
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Если учесть тепловое движение, то нужно добавить случайное воздействие в
+ уравнение движения, которое будет описывать случайное изменение скорости
+ электрона под действием тепловых колебаний атомов.
+ Можно вместо случайного изменения скорости случайно менять координату (это
+ не соответствует физике явления, но проще сделать во время расчета).
+\end_layout
+
+\begin_layout Standard
+Если сила сопротивления Друде описывает передачу части энергии электрона
+ кристаллической решетке, то случайное блуждание будет описывать диффузию
+ электронов (расплывание в стороны).
+\end_layout
+
+\begin_layout Standard
+Уравнение движения на самом деле удобнее переписать, используя и координату,
+ и скорость:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\begin{cases}
+\dot{\vec{v}}= & \frac{q}{m^{*}}\left(\vec{E}+\left[\vec{v},\vec{B}\right]\right)-\frac{\vec{v}}{\tau}-\frac{1}{m^{*}}\nabla U\left(\vec{r}\right)\\
+\dot{\vec{r}}= & \vec{v}
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+В случае случайного изменения координаты, мы можем модифицировать второе
+ уравнение:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\begin{cases}
+\dot{\vec{v}}= & \frac{q}{m^{*}}\left(\vec{E}+\left[\vec{v},\vec{B}\right]\right)-\frac{\vec{v}}{\tau}-\frac{1}{m^{*}}\nabla U\left(\vec{r}\right)\\
+\dot{\vec{r}}= & \vec{v}+\vec{v}_{rand}
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+где 
+\begin_inset Formula $\vec{v}_{rand}$
+\end_inset
+
+ - случайная добавка к скорости, которая меняется с каждым шагом по времени
+ (шаги по времени у нас появятся, когда мы будем использовать численные
+ методы).
+\end_layout
+
+\begin_layout Standard
+Если учесть отталкивание между электронами, то необходимо добавить ещё силу
+ Кулона:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\ddot{\vec{r}}=\frac{q}{m^{*}}\left(\vec{E}+\left[\dot{\vec{r}},\vec{B}\right]\right)-\frac{\dot{\vec{r}}}{\tau}-\frac{1}{m^{*}}\nabla U+\frac{q^{2}}{4\pi\varepsilon_{0}\varepsilon}\sum_{n}\frac{\vec{r}-\vec{r}_{n}}{\left|\vec{r}-\vec{r}_{n}\right|^{3}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+где 
+\begin_inset Formula $n$
+\end_inset
+
+ - индекс, проходящий по всем электронам, достаточно близким к тому, который
+ мы рассматриваем (или всем электронам в нашей области расчёта).
+\end_layout
+
+\begin_layout Standard
+Тогда приходится решать систему уравнений движения.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\ddot{\vec{r}}_{k}=\frac{q}{m^{*}}\left(\vec{E}+\left[\dot{\vec{r}}_{k},\vec{B}\right]\right)-\frac{\dot{\vec{r}}_{k}}{\tau}-\frac{1}{m^{*}}\nabla U\left(\vec{r}_{k}\right)+\frac{q^{2}}{4\pi\varepsilon_{0}\varepsilon}\sum_{n}\frac{\vec{r}_{k}-\vec{r}_{n}}{\left|\vec{r}_{k}-\vec{r}_{n}\right|^{3}}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \end_body
