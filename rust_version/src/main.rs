@@ -1,12 +1,10 @@
 // Program to simulate movement of classical electrons through a 2D array of nanostructures (quantum dots)
 // More comments forthcoming
 use std::fs;
-use std::io::{Write};
-use std::path::{PathBuf};
+use std::io::Write;
+use std::path::PathBuf;
 use std::time::Instant;
-use rand::{Rng};
-
-
+use rand::Rng;
 
 //Reciprocal electron mass in nm^2/fs^2/eV
 const RME: f64 = 0.176;
