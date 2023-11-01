@@ -6,6 +6,8 @@ use std::path::{PathBuf};
 use std::time::Instant;
 use rand::{Rng};
 
+
+
 //Reciprocal electron mass in nm^2/fs^2/eV
 const RME: f64 = 0.176;
 
@@ -47,22 +49,6 @@ fn main() {
     // random number generator
     let mut rng = rand::thread_rng();
 
-    // function to define a singe nanostructure
-    fn u1(x: f64, y: f64, xn: f64, yn: f64) -> f64 {
-        if (x - xn).abs() < (5.0 * A) && (y - yn).abs() < (5.0 * B) {
-            (- CA * (x - xn) * (x - xn) - CB * (y - yn) * (y - yn)).exp()
-        } else { 
-            0.0
-        }
-    }
-    // accelerations due to a single nanostructure
-    fn wx1(x: f64, y: f64, xn: f64, yn: f64) -> f64 {
-        (x - xn) * u1(x, y, xn, yn)
-    }
-    fn wy1(x: f64, y: f64, xn: f64, yn: f64) -> f64 {
-        (y - yn) * u1(x, y, xn, yn)
-    }
-
     // coordinates of nanostructures, cell numbers of nanostructures
     let mut xn: [f64; NN] = [0.0; NN];
     let mut yn: [f64; NN] = [0.0; NN];
@@ -74,22 +60,6 @@ fn main() {
         let rng_y: f64 = rng.gen();
         xn[jn-1] = W + rng_x * (L - 2.0 * W);
         yn[jn-1] = W + rng_y * (L - 2.0 * W);
-    }
-
-    // function to check cell number for any pair of coordinates, as well as its 8 neighbors
-    fn cell_numbers(x: f64, y: f64) -> [usize; 9] {
-        let mut cx = (x / DC).floor() as usize + 1;
-        let mut cy = (y / DC).floor() as usize + 1;
-        if cx > NC1 {cx = NC1};
-        if cy > NC1 {cy = NC1};
-        if cx < 1 {cx = 1};
-        if cy < 1 {cy = 1};
-        let cyd = if cy == 1 {NC1} else {cy - 1};
-        let cyu = if cy == NC1 {1} else {cy + 1};
-        let cxl = if cx == 1 {NC1} else {cx - 1};
-        let cxr = if cx == NC1 {1} else {cx + 1};
-        [NC1 * (cy - 1) + cx, NC1 * (cy - 1) + cxl, NC1 * (cy - 1) + cxr, NC1 * (cyu - 1) + cx, NC1 * (cyd - 1) + cx, 
-        NC1 * (cyu - 1) + cxl, NC1 * (cyu - 1) + cxr, NC1 * (cyd - 1) + cxl, NC1 * (cyd - 1) + cxr]
     }
 
     //file for nanostructures data
@@ -121,45 +91,6 @@ fn main() {
 
     for jc in 1..(NC+1) {
         writeln!(my_file, "{}", nano_in_cell[jc-1]).expect("Error writing to file");
-    }
-
-    // general functions for accelerations
-    fn wx(x: f64, y: f64, nano_in_cell: &[usize; NC], nano_list: &[[(f64, f64); NN]; NC]) -> f64 {
-        let nc = cell_numbers(x, y);
-        let mut wres = 0.0;
-        for jc in 0..9 {
-            let sc = nano_in_cell[nc[jc]-1];
-            if sc > 0 {
-                for j in 1..sc {
-                    let n_l = nano_list[nc[jc]-1][j-1];
-                    wres = wres + wx1(x, y, n_l.0, n_l.1);
-                }
-            }
-        }
-        wres
-    }
-
-    fn wy(x: f64, y: f64, nano_in_cell: &[usize; NC], nano_list: &[[(f64, f64); NN]; NC]) -> f64 {
-        let nc = cell_numbers(x, y);
-        let mut wres = 0.0;
-        for jc in 0..9 {
-            let sc = nano_in_cell[nc[jc]-1];
-            if sc > 0 {
-                for j in 1..sc {
-                    let n_l = nano_list[nc[jc]-1][j-1];
-                    wres = wres + wy1(x, y, n_l.0, n_l.1);
-                }
-            }
-        }
-        wres
-    }
-
-    // Equations right hand sides
-    fn fx(x: f64, y: f64, vx: f64, vy: f64, nano_in_cell: &[usize; NC], nano_list: &[[(f64, f64); NN]; NC]) -> f64 {
-        CWX * wx(x, y, nano_in_cell, nano_list) + CM * EE + CM * EB * vy - CTAU * vx
-    }
-    fn fy(x: f64, y: f64, vx: f64, vy: f64, nano_in_cell: &[usize; NC], nano_list: &[[(f64, f64); NN]; NC]) -> f64 {
-        CWY * wy(x, y, nano_in_cell, nano_list) - CM * EB * vx - CTAU * vy
     }
 
     // Start calculations
@@ -237,4 +168,75 @@ fn main() {
 
     let elapsed = now.elapsed();
     println!("Elapsed: {:.2?}", elapsed);
+}
+
+// function to define a singe nanostructure
+fn u1(x: f64, y: f64, xn: f64, yn: f64) -> f64 {
+    if (x - xn).abs() < (5.0 * A) && (y - yn).abs() < (5.0 * B) {
+        (- CA * (x - xn) * (x - xn) - CB * (y - yn) * (y - yn)).exp()
+    } else { 
+        0.0
+    }
+}
+// accelerations due to a single nanostructure
+fn wx1(x: f64, y: f64, xn: f64, yn: f64) -> f64 {
+    (x - xn) * u1(x, y, xn, yn)
+}
+fn wy1(x: f64, y: f64, xn: f64, yn: f64) -> f64 {
+    (y - yn) * u1(x, y, xn, yn)
+}
+
+// function to check cell number for any pair of coordinates, as well as its 8 neighbors
+fn cell_numbers(x: f64, y: f64) -> [usize; 9] {
+    let mut cx = (x / DC).floor() as usize + 1;
+    let mut cy = (y / DC).floor() as usize + 1;
+    if cx > NC1 {cx = NC1};
+    if cy > NC1 {cy = NC1};
+    if cx < 1 {cx = 1};
+    if cy < 1 {cy = 1};
+    let cyd = if cy == 1 {NC1} else {cy - 1};
+    let cyu = if cy == NC1 {1} else {cy + 1};
+    let cxl = if cx == 1 {NC1} else {cx - 1};
+    let cxr = if cx == NC1 {1} else {cx + 1};
+    [NC1 * (cy - 1) + cx, NC1 * (cy - 1) + cxl, NC1 * (cy - 1) + cxr, NC1 * (cyu - 1) + cx, NC1 * (cyd - 1) + cx, 
+    NC1 * (cyu - 1) + cxl, NC1 * (cyu - 1) + cxr, NC1 * (cyd - 1) + cxl, NC1 * (cyd - 1) + cxr]
+}
+
+// general functions for accelerations
+fn wx(x: f64, y: f64, nano_in_cell: &[usize; NC], nano_list: &[[(f64, f64); NN]; NC]) -> f64 {
+    let nc = cell_numbers(x, y);
+    let mut wres = 0.0;
+    for jc in 0..9 {
+        let sc = nano_in_cell[nc[jc]-1];
+        if sc > 0 {
+            for j in 1..sc {
+                let n_l = nano_list[nc[jc]-1][j-1];
+                wres = wres + wx1(x, y, n_l.0, n_l.1);
+            }
+        }
+    }
+    wres
+}
+
+fn wy(x: f64, y: f64, nano_in_cell: &[usize; NC], nano_list: &[[(f64, f64); NN]; NC]) -> f64 {
+    let nc = cell_numbers(x, y);
+    let mut wres = 0.0;
+    for jc in 0..9 {
+        let sc = nano_in_cell[nc[jc]-1];
+        if sc > 0 {
+            for j in 1..sc {
+                let n_l = nano_list[nc[jc]-1][j-1];
+                wres = wres + wy1(x, y, n_l.0, n_l.1);
+            }
+        }
+    }
+    wres
+}
+
+// Equations right hand sides
+fn fx(x: f64, y: f64, vx: f64, vy: f64, nano_in_cell: &[usize; NC], nano_list: &[[(f64, f64); NN]; NC]) -> f64 {
+    CWX * wx(x, y, nano_in_cell, nano_list) + CM * EE + CM * EB * vy - CTAU * vx
+}
+fn fy(x: f64, y: f64, vx: f64, vy: f64, nano_in_cell: &[usize; NC], nano_list: &[[(f64, f64); NN]; NC]) -> f64 {
+    CWY * wy(x, y, nano_in_cell, nano_list) - CM * EB * vx - CTAU * vy
 }
