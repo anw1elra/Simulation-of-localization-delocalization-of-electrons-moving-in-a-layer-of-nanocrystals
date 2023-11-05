@@ -21,7 +21,7 @@ const ELECTRIC_MAX: f64 = -4.0 * U0 / L; // maximum electric field, eV/nm
 const IV_POINTS: usize = 25; // number of points on IV curve
 const MAGNETIC: f64 = 0.0; // magnetic field induction,
 const NQD: usize = 150; // number of quantum dots (nanostructures)
-const DT: f64 = 0.5; // delta_time, fs
+const DT: f64 = 1.0; // delta_time, fs
 const NE: usize = 100; // number of electrons
 const NC1: usize = 10; // number of cells (to sort electtons and QD)
 
@@ -108,6 +108,11 @@ fn main() {
         let mut en_array = [0.0; NE];
         let mut en_av_time = 0.0;
 
+        //file for IV curve data
+        let fl_name = format!("Velocity_distribution_E{:.3}.dat", ee * 1e4);
+        let file_path: PathBuf = [dir_name, &fl_name].iter().collect();
+        let mut my_file_4 = fs::File::create(file_path).expect("Error creating file");
+
         // PARTICLE LOOP
         for je in 0..NE {
             //file for trajectory data for a single electron
@@ -130,7 +135,9 @@ fn main() {
             let mut vx0: f64 = 0.01 * rnvx;
             let mut vy0: f64 = 0.01 * rnvy;
             // total energy (kinetic + potential)
-            let mut energy: f64 = vx0 * vx0 + vy0 * vy0 + 2.0 * CM * U0 * u(x0, y0, &nano_in_cell, &nano_list) - 2.0 * CM * ee * x0;
+            let mut energy: f64 =
+                vx0 * vx0 + vy0 * vy0 + 2.0 * CM * U0 * u(x0, y0, &nano_in_cell, &nano_list)
+                    - 2.0 * CM * ee * x0;
 
             // TIME LOOP
             for jt in 0..NT {
@@ -184,7 +191,9 @@ fn main() {
                 vx0 = vx0 + (rk_vx1 + 2.0 * rk_vx2 + 2.0 * rk_vx3 + rk_vx4) * DT / 6.0;
                 vy0 = vy0 + (rk_vy1 + 2.0 * rk_vy2 + 2.0 * rk_vy3 + rk_vy4) * DT / 6.0;
 
-                energy = vx0 * vx0 + vy0 * vy0 + 2.0 * CM * U0 * u(x0, y0, &nano_in_cell, &nano_list) - 2.0 * CM * ee * x0;
+                energy =
+                    vx0 * vx0 + vy0 * vy0 + 2.0 * CM * U0 * u(x0, y0, &nano_in_cell, &nano_list)
+                        - 2.0 * CM * ee * x0;
 
                 // Periodic boundary conditions
                 if x0 > L {
@@ -209,8 +218,15 @@ fn main() {
             en_array[je] = en_av_time;
         }
 
+        // write data for velocity and energy distributions
+        for je in 0..NE {
+            writeln!(my_file_4, "{} {}", v_array[je], en_array[je])
+                        .expect("Error writing to file");
+        }
+
         // write IV data to file, I is velocity, V is ee
-        writeln!(my_file_3, "{} {} {}", ee, aver(v_array), aver(en_array)).expect("Error writing to file");
+        writeln!(my_file_3, "{} {} {}", ee, aver(v_array), aver(en_array))
+            .expect("Error writing to file");
     }
 
     let elapsed = now.elapsed();
