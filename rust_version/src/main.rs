@@ -19,7 +19,7 @@ const U0: f64 = -0.2; // depth of QD potential well, eV
 const A: f64 = 20.0; // quantum dot size x, nm
 const B: f64 = 20.0; // quantum dot size y, nm
 const L: f64 = 1500.0; // size of calculation area, nm
-const NP: usize = 1500; // number of points for plotting U(x,y)
+const NP: usize = 500; // number of points for plotting U(x,y)
 const ELECTRIC_MAX: f64 = -4.0 * U0 / L; // maximum electric field, eV/nm
 const IV_POINTS: usize = 25; // number of points on IV curve
 const MAGNETIC: f64 = 0.0; // magnetic field induction,
@@ -99,10 +99,8 @@ fn main() {
 
     //PLOT POTENTIAL MAP U(x,y)
     let mut uxy_map: GridValues = GridValues::new_square(L, NP);
-    
     uxy_map.apply_func(&u, &nano_in_cell, &nano_list);
-
-    draw::plot_2d(uxy_map, "potential_map.png");
+    draw::plot_2d(uxy_map, 1000, 1000, "potential_map.png");
 
     //file for IV curve data
     let fl_name = "IV_curve.dat";
