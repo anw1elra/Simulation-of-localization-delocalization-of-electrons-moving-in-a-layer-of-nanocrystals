@@ -5,6 +5,8 @@ use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
 use std::time::Instant;
+mod draw;
+mod palettes;
 mod plot;
 
 //Reciprocal electron mass in nm^2/fs^2/eV
@@ -17,10 +19,11 @@ const U0: f64 = -0.2; // depth of QD potential well, eV
 const A: f64 = 20.0; // quantum dot size x, nm
 const B: f64 = 20.0; // quantum dot size y, nm
 const L: f64 = 1500.0; // size of calculation area, nm
+const NP: usize = 1500; // number of points for plotting U(x,y)
 const ELECTRIC_MAX: f64 = -4.0 * U0 / L; // maximum electric field, eV/nm
 const IV_POINTS: usize = 25; // number of points on IV curve
 const MAGNETIC: f64 = 0.0; // magnetic field induction,
-const NQD: usize = 150; // number of quantum dots (nanostructures)
+const NQD: usize = 250; // number of quantum dots (nanostructures)
 const DT: f64 = 1.0; // delta_time, fs
 const NE: usize = 100; // number of electrons
 const NC1: usize = 10; // number of cells (to sort electtons and QD)
@@ -93,6 +96,13 @@ fn main() {
     for jc in 1..(NC + 1) {
         writeln!(my_file_2, "{}", nano_in_cell[jc - 1]).expect("Error writing to file");
     }
+
+    //PLOT POTENTIAL MAP U(x,y)
+    let mut uxy_map: GridValues = GridValues::new_square(L, NP);
+    
+    uxy_map.apply_func(&u, &nano_in_cell, &nano_list);
+
+    draw::plot_2d(uxy_map, "potential_map.png");
 
     //file for IV curve data
     let fl_name = "IV_curve.dat";
@@ -220,8 +230,7 @@ fn main() {
 
         // write data for velocity and energy distributions
         for je in 0..NE {
-            writeln!(my_file_4, "{} {}", v_array[je], en_array[je])
-                        .expect("Error writing to file");
+            writeln!(my_file_4, "{} {}", v_array[je], en_array[je]).expect("Error writing to file");
         }
 
         // write IV data to file, I is velocity, V is ee
@@ -361,4 +370,45 @@ fn aver(v_array: [f64; NE]) -> f64 {
         v_av += v_array[je]
     }
     v_av / NE as f64
+}
+
+pub struct GridValues {
+    uxy: Vec<f64>,
+    umax: f64,
+    umin: f64,
+    nx: usize,
+    ny: usize,
+    dx: f64,
+    dy: f64,
+}
+
+impl GridValues {
+    fn new_square(l: f64, n: usize) -> GridValues {
+        GridValues {
+            uxy: Vec::new(),
+            umax: 0.0,
+            umin: 0.0,
+            nx: n,
+            ny: n,
+            dx: l / n as f64,
+            dy: l / n as f64,
+        }
+    }
+
+    fn apply_func(&mut self,
+        u: &dyn Fn(f64, f64, &[usize; NC], &[[(f64, f64); NQD]; NC]) -> f64,    
+        nano_in_cell: &[usize; NC], 
+        nano_list: &[[(f64, f64); NQD]; NC],
+    ) {
+        for jx in 0..self.nx {
+            for jy in 0..self.ny {
+                let x = self.dx * jx as f64;
+                let y = self.dy * jy as f64;
+                self.uxy.push(u(x, y, nano_in_cell, nano_list))
+            }
+        }
+
+        self.umax = self.uxy.iter().cloned().fold(0./0., f64::max);
+        self.umin = self.uxy.iter().cloned().fold(0./0., f64::min);
+    }
 }

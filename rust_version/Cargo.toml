@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-egui-macroquad = "0.15.0"
-macroquad = "0.4.4"
 rand = {version = "0.8.5"}
 plotly = { version = "0.8.4", features = ["kaleido"] }
+image = "0.24.7"

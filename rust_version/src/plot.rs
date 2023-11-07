@@ -10,15 +10,15 @@ fn line_and_scatter_plot(x: Vec<f64>, y: Vec<f64>, flnm: &str, ylab: &str, legen
     let bgcol = Rgb::new(255, 255, 255);
     let linecol1 = col;
     let forecol = Rgb::new(0, 0, 0);
-    let gridcol = Rgb::new(120, 120, 120);
+    let gridcol = Rgb::new(180, 180, 180);
     let transp = NamedColor::Transparent;
-    let thick: usize = 4;
+    let thick: usize = 3;
     let medium: usize = 3;
     let _thin: usize = 2;
     let msize: usize = 10;
     let fsz_title: usize = 35;
     let fsz_legend: usize = 35;
-    let fsz_ticks: usize = 30;
+    let fsz_ticks: usize = 25;
     let fsz_axes: usize = 35;
 
     let trace1 = Scatter::new(x.clone(), y)
@@ -61,7 +61,8 @@ fn line_and_scatter_plot(x: Vec<f64>, y: Vec<f64>, flnm: &str, ylab: &str, legen
     let axisy = axis
         .clone()
         .title(Title::new(ylab)
-            .font(Font::new().size(fsz_axes).color(forecol).family("Serif")));
+            .font(Font::new().size(fsz_axes).color(forecol).family("Serif")))
+            .tick_angle(270.0);
 
     let line_top = Shape::new()
         .shape_type(ShapeType::Line)
@@ -104,7 +105,7 @@ fn line_and_scatter_plot(x: Vec<f64>, y: Vec<f64>, flnm: &str, ylab: &str, legen
 
     //plot.write_html(flnm);
     //plot.write_image(flnm, ImageFormat::SVG, 1024, 768, 1.0);
-    plot.write_image(flnm, ImageFormat::PNG, 1024, 768, 1.0);
+    plot.write_image(flnm, ImageFormat::PNG, 1280, 960, 1.0);
 }
 
 pub fn plot_data() -> std::io::Result<()> {
