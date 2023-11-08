@@ -123,7 +123,7 @@ fn histogram_plot(y: Vec<f64>, flnm: PathBuf, xlab: &str, title_text: &str, fill
     let fsz_axes: usize = 35;
 
     let bars = Histogram::new(y)
-        .name("").x_bins(Bins::new(0.0, crate::VMAX, 0.1*crate::VMAX))
+        .name("").x_bins(Bins::new(-0.5, crate::VMAX, 0.025*crate::VMAX))
         .marker(Marker::new().color(fillcol));
 
     let title = Title::new(title_text)
@@ -146,7 +146,7 @@ fn histogram_plot(y: Vec<f64>, flnm: PathBuf, xlab: &str, title_text: &str, fill
         Title::new(xlab)
             .font(Font::new().size(fsz_axes).color(forecol).family("Serif")))
             .fixed_range(true)
-            .range(vec![0.0,crate::VMAX]);
+            .range(vec![-0.5,crate::VMAX]);
 
     let axisy = axis
         .clone()

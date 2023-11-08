@@ -15,20 +15,20 @@ const RME: f64 = 0.176;
 
 // Input parameters
 const ME: f64 = 0.067; // electron effective mass
-const TAU: f64 = 2000.0; // scattering time, fs
+const TAU: f64 = 4000.0; // scattering time, fs
 const U0: f64 = -0.2; // depth of QD potential well, eV
-const A: f64 = 25.0; // quantum dot size x, nm
-const B: f64 = 25.0; // quantum dot size y, nm
+const A: f64 = 20.0; // quantum dot size x, nm
+const B: f64 = 20.0; // quantum dot size y, nm
 const L: f64 = 2000.0; // size of calculation area, nm
 const NP: usize = 2000; // number of grid points for plotting U(x,y) map
 const WIDTH: usize = 2000; // U(x,y) png map resolution
-const ELECTRIC_MAX: f64 = -5.0 * U0 / L; // maximum electric field, eV/nm
-const VMAX: f64 = ELECTRIC_MAX*TAU*RME/ME;
+const ELECTRIC_MAX: f64 = 5.0 * 1e-4; // maximum electric field, eV/nm
+const VMAX: f64 = 5.0;
 const IV_POINTS: usize = 50; // number of points on IV curve
 const MAGNETIC: f64 = 0.0; // magnetic field induction,
 const NQD: usize = 250; // number of quantum dots (nanostructures)
 const DT: f64 = 1.0; // delta_time, fs
-const NE: usize = 300; // number of electrons
+const NE: usize = 500; // number of electrons
 const NEST: usize = 10; // number of electron trajectories to save
 const NC1: usize = 10; // number of cells (to sort electtons and QD)
 
