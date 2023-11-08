@@ -8,6 +8,7 @@ use std::time::Instant;
 mod draw;
 mod palettes;
 mod plot;
+mod file;
 
 //Reciprocal electron mass in nm^2/fs^2/eV
 const RME: f64 = 0.176;
@@ -16,21 +17,23 @@ const RME: f64 = 0.176;
 const ME: f64 = 0.067; // electron effective mass
 const TAU: f64 = 2000.0; // scattering time, fs
 const U0: f64 = -0.2; // depth of QD potential well, eV
-const A: f64 = 20.0; // quantum dot size x, nm
-const B: f64 = 20.0; // quantum dot size y, nm
-const L: f64 = 1500.0; // size of calculation area, nm
-const NP: usize = 500; // number of points for plotting U(x,y)
-const ELECTRIC_MAX: f64 = -4.0 * U0 / L; // maximum electric field, eV/nm
-const IV_POINTS: usize = 25; // number of points on IV curve
+const A: f64 = 15.0; // quantum dot size x, nm
+const B: f64 = 15.0; // quantum dot size y, nm
+const L: f64 = 2000.0; // size of calculation area, nm
+const NP: usize = 1000; // number of grid points for plotting U(x,y) map
+const WIDTH: usize = 1000; // U(x,y) png map resolution
+const ELECTRIC_MAX: f64 = -5.0 * U0 / L; // maximum electric field, eV/nm
+const VMAX: f64 = ELECTRIC_MAX*TAU*RME/ME;
+const IV_POINTS: usize = 50; // number of points on IV curve
 const MAGNETIC: f64 = 0.0; // magnetic field induction,
 const NQD: usize = 250; // number of quantum dots (nanostructures)
 const DT: f64 = 1.0; // delta_time, fs
-const NE: usize = 100; // number of electrons
+const NE: usize = 300; // number of electrons
 const NC1: usize = 10; // number of cells (to sort electtons and QD)
 
 // Auxillary parameters
 const NC: usize = NC1 * NC1;
-const TF: f64 = 4.0 * TAU;
+const TF: f64 = 5.0 * TAU;
 const NT: usize = (TF / DT) as usize;
 const CM: f64 = RME / ME;
 const CTAU: f64 = 1.0 / TAU;
@@ -100,16 +103,16 @@ fn main() {
     //PLOT POTENTIAL MAP U(x,y)
     let mut uxy_map: GridValues = GridValues::new_square(L, NP);
     uxy_map.apply_func(&u, &nano_in_cell, &nano_list);
-    draw::plot_2d(uxy_map, 1000, 1000, "potential_map.png");
+    draw::plot_2d(uxy_map, WIDTH, WIDTH, "potential_map.png");
 
     //file for IV curve data
     let fl_name = "IV_curve.dat";
-    let file_path: PathBuf = [fl_name].iter().collect();
+    let file_path: PathBuf = [dir_name,fl_name].iter().collect();
     let mut my_file_3 = fs::File::create(file_path).expect("Error creating file");
 
     // Start calculations
     // Electric field loop
-    for j_field in 0..IV_POINTS {
+    for j_field in 1..=IV_POINTS {
         let ee = j_field as f64 * ELECTRIC_MAX / IV_POINTS as f64;
         let mut v_array = [0.0; NE];
         let mut v_av_time = 0.0;
@@ -117,7 +120,7 @@ fn main() {
         let mut en_av_time = 0.0;
 
         //file for IV curve data
-        let fl_name = format!("Velocity_distribution_E{:.3}.dat", ee * 1e4);
+        let fl_name = format!("Velocity_distribution_E-{}.dat", j_field);
         let file_path: PathBuf = [dir_name, &fl_name].iter().collect();
         let mut my_file_4 = fs::File::create(file_path).expect("Error creating file");
 
@@ -128,7 +131,7 @@ fn main() {
             let mut fl_name = format!("Empty file.dat");
             // ONLY RECORD 5 TRAJECTORIES
             if je < 5 {
-                fl_name = format!("Trajectory_e{}_E{:.3}.dat", je + 1, ee * 1e4)
+                fl_name = format!("Trajectory_e{}_E-{}.dat", je + 1, j_field)
             }
             let file_path: PathBuf = [dir_name, &fl_name].iter().collect();
             let mut my_file = fs::File::create(file_path).expect("Error creating file");
@@ -136,22 +139,19 @@ fn main() {
             // initial data
             let rnx: f64 = rng.gen();
             let rny: f64 = rng.gen();
-            let rnvx: f64 = rng.gen();
-            let rnvy: f64 = rng.gen();
             let mut x0: f64 = W + (L - 2.0 * W) * rnx;
             let mut y0: f64 = W + (L - 2.0 * W) * rny;
-            let mut vx0: f64 = 0.01 * rnvx;
-            let mut vy0: f64 = 0.01 * rnvy;
+            let mut vx0: f64 = 0.0;
+            let mut vy0: f64 = 0.0;
             // total energy (kinetic + potential)
             let mut energy: f64 =
                 vx0 * vx0 + vy0 * vy0 + 2.0 * CM * U0 * u(x0, y0, &nano_in_cell, &nano_list)
                     - 2.0 * CM * ee * x0;
 
             // TIME LOOP
-            for jt in 0..NT {
+            for _jt in 0..NT {
                 if je < 5 {
-                    let t: f64 = DT * (jt as f64);
-                    writeln!(my_file, "{} {} {} {} {} {}", t, x0, y0, vx0, vy0, energy)
+                    writeln!(my_file, "{} {}", x0, y0)
                         .expect("Error writing to file");
                 }
                 // calculating average velocity for a single electron over time
@@ -232,7 +232,7 @@ fn main() {
         }
 
         // write IV data to file, I is velocity, V is ee
-        writeln!(my_file_3, "{} {} {}", ee, aver(v_array), aver(en_array))
+        writeln!(my_file_3, "{} {} {}", ee * 1e4, aver(v_array), aver(en_array))
             .expect("Error writing to file");
     }
 
