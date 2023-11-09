@@ -103,8 +103,10 @@ fn main() {
 
     //PLOT POTENTIAL MAP U(x,y)
     let mut uxy_map: GridValues = GridValues::new_square(L, NP);
-    uxy_map.apply_func(&u, &nano_in_cell, &nano_list);
+    uxy_map.apply_func_u(&u,&nano_in_cell,&nano_list);
     draw::plot_2d(uxy_map, WIDTH, WIDTH, "potential_map.png");
+
+    //panic!("Just needed to plot the potential");
 
     //file for IV curve data
     let fl_name = "IV_curve.dat";
@@ -394,7 +396,7 @@ impl GridValues {
         }
     }
 
-    fn apply_func(&mut self,
+    fn apply_func_u(&mut self,
         u: &dyn Fn(f64, f64, &[usize; NC], &[[(f64, f64); NQD]; NC]) -> f64,    
         nano_in_cell: &[usize; NC], 
         nano_list: &[[(f64, f64); NQD]; NC],
@@ -410,4 +412,23 @@ impl GridValues {
         self.umax = self.uxy.iter().cloned().fold(0./0., f64::max);
         self.umin = self.uxy.iter().cloned().fold(0./0., f64::min);
     }
+
+    fn _apply_func(&mut self,
+        f: &dyn Fn(f64, f64) -> f64,    
+    ) {
+        for jx in 0..self.nx {
+            for jy in 0..self.ny {
+                let x = self.dx * jx as f64;
+                let y = self.dy * jy as f64;
+                self.uxy.push(f(x, y))
+            }
+        }
+
+        self.umax = self.uxy.iter().cloned().fold(0./0., f64::max);
+        self.umin = self.uxy.iter().cloned().fold(0./0., f64::min);
+    }
+}
+
+fn _plot_chek(x:  f64, y: f64) -> f64 {
+    (-2.0*(x-0.5*L)*(x-0.5*L)/L/L-2.0*(y-0.5*L)*(y-0.5*L)/L/L).exp()
 }
