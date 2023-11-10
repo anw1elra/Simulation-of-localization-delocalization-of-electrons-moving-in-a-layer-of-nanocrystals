@@ -40,25 +40,25 @@ func main() {
 				
 				switch je {
 				case 1:
-					dc.SetRGB255(31,119,180)
+					dc.SetRGB255(255,56,24)
 				case 2:
-					dc.SetRGB255(255,127,15)
+					dc.SetRGB255(129,68,163)
 				case 3:
-					dc.SetRGB255(44,160,44)
+					dc.SetRGB255(255,125,36)
 				case 4:
-					dc.SetRGB255(214,39,40)
+					dc.SetRGB255(255,217,57)
 				case 5:
-					dc.SetRGB255(148,103,189)
+					dc.SetRGB255(163,81,58)
 				case 6:
-					dc.SetRGB255(140,86,75)
+					dc.SetRGB255(175,211,80)
 				case 7:
-					dc.SetRGB255(227,119,194)
+					dc.SetRGB255(117,213,209)
 				case 8:
-					dc.SetRGB255(118,183,178)
+					dc.SetRGB255(78,190,98)
 				case 9:
-					dc.SetRGB255(237,201,73)
+					dc.SetRGB255(56,204,246)
 				case 10:
-					dc.SetRGB255(23,190,206)
+					dc.SetRGB255(16,123,196)
 				}
 
 				for jx := -2; jx <= 2; jx++ {
