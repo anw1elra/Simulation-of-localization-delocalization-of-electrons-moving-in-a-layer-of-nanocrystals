@@ -107,7 +107,7 @@ fn line_and_scatter_plot(x: Vec<f64>, y: Vec<f64>, flnm: PathBuf, ylab: &str, le
 
     //plot.write_html(flnm);
     //plot.write_image(flnm, ImageFormat::SVG, 1024, 768, 1.0);
-    plot.write_image(flnm, ImageFormat::PNG, 1280, 960, 1.0);
+    plot.write_image(flnm, ImageFormat::PDF, 1280, 960, 1.0);
 }
 
 fn histogram_plot(y: Vec<f64>, flnm: PathBuf, xlab: &str, title_text: &str, fillcol: NamedColor) {
@@ -195,7 +195,7 @@ fn histogram_plot(y: Vec<f64>, flnm: PathBuf, xlab: &str, title_text: &str, fill
 
     //plot.write_html(flnm);
     //plot.write_image(flnm, ImageFormat::SVG, 1024, 768, 1.0);
-    plot.write_image(flnm, ImageFormat::PNG, 1280, 960, 1.0);
+    plot.write_image(flnm, ImageFormat::PDF, 1280, 960, 1.0);
 }
 
 pub fn plot_data() -> std::io::Result<()> {
@@ -209,9 +209,18 @@ pub fn plot_data() -> std::io::Result<()> {
     let y1 = data[1].clone();
     let y2 = data[2].clone();
 
-    let file_path: PathBuf = [dir_name, "Velocity vs field.png"].iter().collect();
-    line_and_scatter_plot(x.clone(), y1, file_path, "Velocity, nm/fs", " <Vx>  ", NamedColor::DarkBlue);
-    let file_path: PathBuf = [dir_name, "Energy vs field.png"].iter().collect();
+    let mut mobility = y1.clone();
+    let mut j = 0;
+    for m in mobility.clone() {
+        mobility[j] = m/x[j];
+        j += 1;
+    }
+
+    let file_path: PathBuf = [dir_name, "Velocity vs field.pdf"].iter().collect();
+    line_and_scatter_plot(x.clone(), y1.clone(), file_path, "Velocity, nm/fs", " <Vx>  ", NamedColor::DarkBlue);
+    let file_path: PathBuf = [dir_name, "Mobility vs field.pdf"].iter().collect();
+    line_and_scatter_plot(x.clone(), mobility, file_path, "Mobility, nm/fs * cm/kV", " <μ>  ", NamedColor::DarkBlue);
+    let file_path: PathBuf = [dir_name, "Energy vs field.pdf"].iter().collect();
     line_and_scatter_plot(x, y2, file_path, "Energy, eV", " <E>  ", NamedColor::DarkRed);
 
     for j_field in 1..=crate::IV_POINTS {

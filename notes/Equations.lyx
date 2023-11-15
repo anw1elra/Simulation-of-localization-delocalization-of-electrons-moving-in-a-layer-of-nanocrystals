@@ -225,6 +225,10 @@ m^{*}=0.067m_{e}
  электрона под действием тепловых колебаний атомов.
  Можно вместо случайного изменения скорости случайно менять координату (это
  не соответствует физике явления, но проще сделать во время расчета).
+ 
+\series bold
+Мы тепловое движение учитывать не будем (считаем, что эксперимент проводится
+ при низких температурах, около 4К).
 \end_layout
 
 \begin_layout Standard
@@ -319,6 +323,320 @@ m^{*}=0.067m_{e}
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Полная энергия
+\end_layout
+
+\begin_layout Standard
+Полная энергия электронов без учета рассеяния (то есть силы сопротивления
+ 
+\begin_inset Formula $-\frac{\vec{v}}{\tau}$
+\end_inset
+
+) должна сохраняться.
+ Это можно использовать для проверки точности метода расчёта.
+\end_layout
+
+\begin_layout Standard
+Перед этим учтём, что напряженность поля (у нас оно направлено только по
+ оси 
+\begin_inset Formula $x$
+\end_inset
+
+) связана с потенциалом:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\vec{E}=-\frac{\partial}{\partial x}\varphi
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q\vec{E}=-\frac{\partial}{\partial x}U_{E}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Однородное электрическое поле:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+U_{E}=U_{0}-qEx
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Запишем выражение для полной энергии одного электрона:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+W=K+U=\frac{m}{2}\left(v_{x}^{2}+v_{y}^{2}\right)+U_{QD}\left(x,y\right)+U_{0}-qEx
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+С учетом периодических граничных условий, когда электрон переходит через
+ правую границу, энергия скачком увеличивается на 
+\begin_inset Formula $qEL$
+\end_inset
+
+, что не соответствует физике процесса.
+\end_layout
+
+\begin_layout Standard
+Решением этой проблемы будет хранить 
+\series bold
+истинную координату
+\series default
+ 
+\begin_inset Formula $\tilde{x}$
+\end_inset
+
+ для каждого электрона.
+ То есть при каждом переходе через правую или через левую границу, нужно
+ сохранять его настоящую координату, хотя во всех уравнениях будет 
+\begin_inset Quotes eld
+\end_inset
+
+внутренняя координата
+\begin_inset Quotes erd
+\end_inset
+
+ расчётной области, для которой выполняется условие:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+x\in[0,L]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Если разобраться, как правильно сохранять 
+\begin_inset Formula $\tilde{x}$
+\end_inset
+
+ на каждом шаге, то можно вычислять правильную энергию:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+W=K+U=\frac{m^{*}}{2}\left(v_{x}^{2}+v_{y}^{2}\right)+U_{QD}\left(x,y\right)+U_{0}-qE\tilde{x}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Как влияет сила сопротивления 
+\begin_inset Formula $-\frac{\vec{v}}{\tau}$
+\end_inset
+
+ на полную энергию?
+\end_layout
+
+\begin_layout Standard
+Без учета других слагаемых уравнение движения (уравнение Друде) будет иметь
+ вид:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\dot{\vec{v}}=\frac{q}{m^{*}}\vec{E}-\frac{\vec{v}}{\tau}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Его точным решением при нулевом начальном условии 
+\begin_inset Formula $\vec{v}(0)=0$
+\end_inset
+
+ будет:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\vec{v}(t)=\frac{q\tau\vec{E}}{m^{*}}\left(1-\exp\left(-\frac{t}{\tau}\right)\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{q\tau E}{m^{*}}=v_{\infty}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu=\frac{v_{\infty}}{E}=\frac{q\tau}{m^{*}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\sigma=qn\mu
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Получается, что полная энергия электрона должна иметь вид:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+W=K+U=\frac{m^{*}}{2}v^{2}=\frac{q^{2}E^{2}\tau^{2}}{2m^{*}}\left(1-\exp\left(-\frac{t}{\tau}\right)\right)^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+W(t\to\infty)=\frac{q^{2}E^{2}\tau^{2}}{2m^{*}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{x}(t\to\infty)=\tilde{x}_{0}+v_{\infty}t
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Всю остальную энергию, которую он мог бы получать от электрического поля,
+ он отдает кристаллу.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+Q(t\to\infty)=qE\tilde{x}=qE\left(\tilde{x}_{0}+v_{\infty}t\right)=Q_{0}+qEv_{\infty}t=Q_{0}+\frac{\tau q^{2}E^{2}}{m^{*}}t
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+Q(t\to\infty)=Q_{0}+q\mu E^{2}t
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Для 
+\begin_inset Formula $n$
+\end_inset
+
+ электронов получаем:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+Q(t\to\infty)=Q_{0}n+qn\mu E^{2}t=Q_{0}n+\sigma E^{2}t
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Мощность нагрева равна:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P=\frac{dQ}{dt}=\sigma E^{2}=\frac{j^{2}}{\sigma}=\rho j^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Это в точности закон Джоуля-Ленца.
 \end_layout
 
 \end_body
