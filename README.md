@@ -1,2 +1,2 @@
-# Simulation-of-localization-delocalization-of-electrons-moving-in-a-layer-of-nanocrystals
+# Localization-delocalization-of-electrons
 проект для "юниора"
