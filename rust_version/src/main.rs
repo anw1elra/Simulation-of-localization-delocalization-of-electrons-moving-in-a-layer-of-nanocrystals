@@ -18,7 +18,7 @@ const ME: f64 = 0.067; // electron effective mass
 const TAU: f64 = 4000.0; // scattering time, fs
 const U0: f64 = -0.2; // depth of QD potential well, eV
 const A: f64 = 20.0; // quantum dot size x, nm
-const B: f64 = 20.0; // quantum dot size y, nm
+const B: f64 = 10.0; // quantum dot size y, nm
 const L: f64 = 2000.0; // size of calculation area, nm
 const NP: usize = 2000; // number of grid points for plotting U(x,y) map
 const WIDTH: usize = 2000; // U(x,y) png map resolution
@@ -245,20 +245,29 @@ fn main() {
     plot::plot_data().ok();
 }
 
-// function to define a singe nanostructure
-fn u1(x: f64, y: f64, xn: f64, yn: f64) -> f64 {
-    if (x - xn).abs() < (5.0 * A) && (y - yn).abs() < (5.0 * B) {
-        (-CA * (x - xn) * (x - xn) - CB * (y - yn) * (y - yn)).exp()
+fn u1qd(x: f64, y: f64, xn: f64, yn: f64, ca: f64) -> f64 {
+    if (x - xn).abs() < (5.0 * A) && (y - yn).abs() < (5.0 * A) {
+        (-ca * (x - xn) * (x - xn) - ca * (y - yn) * (y - yn)).exp() // квантовая точка
     } else {
         0.0
     }
 }
+
+// function to define a singe nanostructure
+fn u1(x: f64, y: f64, xn: f64, yn: f64) -> f64 {
+    if (x - xn).abs() < (5.0 * A) && (y - yn).abs() < (5.0 * A) {
+        2.0*(u1qd(x, y, xn, yn, CA) - u1qd(x, y, xn, yn, CB)) // квантовое кольцо
+    } else {
+        0.0
+    }
+}
+
 // accelerations due to a single nanostructure
 fn wx1(x: f64, y: f64, xn: f64, yn: f64) -> f64 {
-    (x - xn) * u1(x, y, xn, yn)
+    2.0*(x - xn) * (u1qd(x, y, xn, yn, CA) - CB/CA*u1qd(x, y, xn, yn, CB))
 }
 fn wy1(x: f64, y: f64, xn: f64, yn: f64) -> f64 {
-    (y - yn) * u1(x, y, xn, yn)
+    2.0*(y - yn) * (u1qd(x, y, xn, yn, CA) - CB/CA*u1qd(x, y, xn, yn, CB))
 }
 
 // function to check cell number for any pair of coordinates, as well as its 8 neighbors
