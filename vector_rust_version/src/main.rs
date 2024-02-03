@@ -54,7 +54,7 @@ fn main() {
     io::stdin().read_line(&mut input_line).expect("Failed to read line");
     let nqd: usize = input_line.trim().parse().expect("Input not an integer");
 
-    // Path::new("/etc/hosts").exists()
+    // create data dir
     let cur_dir = env::current_dir().unwrap();
     let ancestor_dir = &cur_dir.ancestors().nth(1).unwrap().join("data");
 
